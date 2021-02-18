@@ -8,21 +8,30 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
 import java.util.ArrayList;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+
+
 public class MainActivity extends AppCompatActivity {
-    private String workings = "";
-    private String formula = "";
-    private String tempFormula = "";
+    private String workings;
+    private String formula;
+    private String tempFormula;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        workings = "";
+        formula = "";
+        tempFormula = "";
     }
 
     private void SetTextResults(String str)
@@ -44,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void equalsOnClick(View view)
     {
-        Double result = null;
+
+        /*Double result = null;
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("rhino");
         checkForPowerOf();
 
@@ -56,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if(result != null)
-            SetTextResults(String.valueOf(result.doubleValue()));
+            SetTextResults(String.valueOf(result.doubleValue()));*/
+        SetTextResults("DICK" + workings);
 
     }
 
@@ -118,103 +129,152 @@ public class MainActivity extends AppCompatActivity {
         workings = "";
         SetTextWorkings(workings);
         SetTextResults("");
-        leftBracket = true;
     }
 
-    boolean leftBracket = true;
-
-    public void bracketsOnClick(View view)
+    public void bracketsOnClick(View view)//-------------------------------------------------------------------
     {
-        if(leftBracket)
+        if(workings.isEmpty())
         {
             setWorkings("(");
-            leftBracket = false;
         }
-        else
-        {
+        else if (workings.charAt(workings.length() - 1) == '('){
+            return;
+        }
+        else if (isNumeric(workings.charAt(workings.length() - 1))) {
             setWorkings(")");
-            leftBracket = true;
         }
     }
 
-    public void powerOfOnClick(View view)
-    {
-        setWorkings("^");
+    public void powerOfOnClick(View view) {
+        if(!workings.isEmpty()) {
+            if (workings.charAt(workings.length() - 1) == '^' || workings.charAt(workings.length() - 1) == '(') {
+                return;
+            } else if (workings.charAt(workings.length() - 1) == '-' || workings.charAt(workings.length() - 1) == '+'
+                    || workings.charAt(workings.length() - 1) == '*' || workings.charAt(workings.length() - 1) == '/') {
+                workings = workings.substring(0, workings.length() - 1);
+            }
+            setWorkings("^");
+        }
+
     }
 
-    public void divisionOnClick(View view)
-    {
-        setWorkings("/");
+    public void divisionOnClick(View view) {
+        if(!workings.isEmpty()) {
+            if (workings.charAt(workings.length() - 1) == '/' || workings.charAt(workings.length() - 1) == '(') {
+                return;
+            } else if (workings.charAt(workings.length() - 1) == '-' || workings.charAt(workings.length() - 1) == '+'
+                    || workings.charAt(workings.length() - 1) == '^' || workings.charAt(workings.length() - 1) == '*') {
+                workings = workings.substring(0, workings.length() - 1);
+            }
+            setWorkings("/");
+        }
+
     }
 
-    public void sevenOnClick(View view)
-    {
+    public void sevenOnClick(View view) {
         setWorkings("7");
     }
 
-    public void eightOnClick(View view)
-    {
+    public void eightOnClick(View view) {
         setWorkings("8");
     }
 
-    public void nineOnClick(View view)
-    {
+    public void nineOnClick(View view) {
         setWorkings("9");
     }
 
-    public void timesOnClick(View view)
-    {
-        setWorkings("*");
+    public void timesOnClick(View view) {
+        if(!workings.isEmpty()) {
+            if (workings.charAt(workings.length() - 1) == '*' || workings.charAt(workings.length() - 1) == '(') {
+                return;
+            } else if (workings.charAt(workings.length() - 1) == '-' || workings.charAt(workings.length() - 1) == '+'
+                    || workings.charAt(workings.length() - 1) == '^' || workings.charAt(workings.length() - 1) == '/') {
+                workings = workings.substring(0, workings.length() - 1);
+            }
+            setWorkings("*");
+        }
+
     }
 
-    public void fourOnClick(View view)
+    public void DelOneCharOnClick(View view)
     {
+        if (!workings.isEmpty()) {
+            workings = workings.substring(0, workings.length() - 1);
+            SetTextWorkings(workings);
+        }
+    }
+
+    public void fourOnClick(View view) {
         setWorkings("4");
     }
 
-    public void fiveOnClick(View view)
-    {
+    public void fiveOnClick(View view) {
         setWorkings("5");
     }
 
-    public void sixOnClick(View view)
-    {
+    public void sixOnClick(View view) {
         setWorkings("6");
     }
 
-    public void minusOnClick(View view)
-    {
+    public void minusOnClick(View view) {
+        if(!workings.isEmpty()) {
+
+            if (workings.charAt(workings.length() - 1) == '-') {
+                return;
+            } else if (workings.charAt(workings.length() - 1) == '*' || workings.charAt(workings.length() - 1) == '+'
+                    || workings.charAt(workings.length() - 1) == '^' || workings.charAt(workings.length() - 1) == '/') {
+                workings = workings.substring(0, workings.length() - 1);
+            }
+        }
         setWorkings("-");
     }
 
-    public void oneOnClick(View view)
-    {
+    public void oneOnClick(View view) {
         setWorkings("1");
     }
 
-    public void twoOnClick(View view)
-    {
+    public void twoOnClick(View view) {
         setWorkings("2");
     }
 
-    public void threeOnClick(View view)
-    {
+    public void threeOnClick(View view) {
         setWorkings("3");
     }
 
-    public void plusOnClick(View view)
-    {
-        setWorkings("+");
+    public void plusOnClick(View view) {
+        if(!workings.isEmpty()) {
+            if (workings.charAt(workings.length() - 1) == '+' || workings.charAt(workings.length() - 1) == '(') {
+                return;
+            } else if (workings.charAt(workings.length() - 1) == '-' || workings.charAt(workings.length() - 1) == '/'
+                    || workings.charAt(workings.length() - 1) == '^' || workings.charAt(workings.length() - 1) == '*') {
+                workings = workings.substring(0, workings.length() - 1);
+            }
+            setWorkings("+");
+        }
     }
 
-    public void decimalOnClick(View view)
-    {
-        setWorkings(".");
+    public void decimalOnClick(View view) {
+        if(workings.isEmpty()) {
+            setWorkings("0.");
+        }
+        else if(!isNumeric(workings.charAt(workings.length() - 1))) {
+            setWorkings("0.");
+        }
+        else {
+            setWorkings(".");
+        }
     }
 
-    public void zeroOnClick(View view)
-    {
-        setWorkings("0");
+    public void zeroOnClick(View view) {
+        if(workings.isEmpty()) {
+            setWorkings("0.");
+        }
+        else if(!isNumeric(workings.charAt(workings.length() - 1))) {
+            setWorkings("0.");
+        }
+        else {
+            setWorkings("0");
+        }
     }
 
 }
