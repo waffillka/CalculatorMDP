@@ -208,6 +208,9 @@ public class MainActivity extends AppCompatActivity {
         if (!workings.isEmpty()) {
             workings = workings.substring(0, workings.length() - 1);
             SetTextWorkings(workings);
+            if (!GetTextResults().equals("")) {
+                SetTextResults("");
+            }
         }
     }
 
