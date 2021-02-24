@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.text.TextUtils;
+import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout linearLayout;
     private String memory;
     private Boolean checkMemory;
+    private TextView resultsTV;
+    private TextView workingsTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +36,21 @@ public class MainActivity extends AppCompatActivity {
         workings = "";
         memory = "";
         checkMemory = true;
-        linearLayout=findViewById(R.id.ll);
+        linearLayout = findViewById(R.id.ll);
         int width = getScreenWidth(MainActivity.this);
 
+        resultsTV = (TextView)findViewById(R.id.resultTextView);
+        workingsTV = (TextView)findViewById(R.id.workingsTextView);
+
+        //workingsTV.setMovementMethod(new ScrollingMovementMethod());
+        //workingsTV.setHorizontallyScrolling(true);
+       /*workingsTextView.setSelected(true);
+        workingsTextView.setEllipsize(TextUtils.TruncateAt.START);
+        workingsTextView.setSingleLine(true);*/
 
         int childCount = linearLayout.getChildCount();
-        for (int i = 0; i < childCount; i++){
+
+        for (int i = 0; i < childCount; i++) {
             TextView button = (TextView) linearLayout.getChildAt(i);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width / 4, -1, LinearLayout.LayoutParams.WRAP_CONTENT);
             button.setLayoutParams(params);
@@ -52,16 +66,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void SetTextResults(String str) {
-        TextView resultsTV = (TextView)findViewById(R.id.resultTextView);
         resultsTV.setText(str);
     }
     private void SetTextWorkings(String str) {
-        TextView workingsTV = (TextView)findViewById(R.id.workingsTextView);
         workingsTV.setText(str);
     }
 
     private String GetTextResults() {
-        TextView resultsTV = (TextView)findViewById(R.id.resultTextView);
         return resultsTV.getText().toString();
     }
 
@@ -97,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception ex) {
                     String exception = ex.toString();
                     exception = exception.substring(exception.indexOf(":") + 1);
-                    Toast.makeText(MainActivity.this, exception, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, exception, Toast.LENGTH_LONG).show();
                 }
         }
     }
@@ -311,7 +322,9 @@ public class MainActivity extends AppCompatActivity {
         CheckNumbers();
         if(workings.isEmpty()) {
             setWorkings("0.");
-        } else {
+        } else if(!isNumeric(workings.charAt(workings.length() - 1))) {
+            setWorkings("0.");
+        }else {
             for(int i = workings.length() - 1; i >= 0; --i) {
                 if(workings.charAt(i) == '.') {
                     return;
