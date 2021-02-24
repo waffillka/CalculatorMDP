@@ -2,9 +2,14 @@ package com.example.calculatormdp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,7 +19,9 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class MainActivity extends AppCompatActivity {
     private String workings;
-
+    private LinearLayout linearLayout;
+    private String memory;
+    private Boolean checkMemory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +29,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         workings = "";
+        memory = "";
+        checkMemory = true;
+        linearLayout=findViewById(R.id.ll);
+        int width = getScreenWidth(MainActivity.this);
+
+
+        int childCount = linearLayout.getChildCount();
+        for (int i = 0; i < childCount; i++){
+            TextView button = (TextView) linearLayout.getChildAt(i);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width / 4, -1, LinearLayout.LayoutParams.WRAP_CONTENT);
+            button.setLayoutParams(params);
+        }
+    }
+
+    public static int getScreenWidth(Context context) {
+        WindowManager windowManager = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(dm);
+        return dm.widthPixels;
     }
 
     private void SetTextResults(String str) {
@@ -43,35 +70,36 @@ public class MainActivity extends AppCompatActivity {
         SetTextWorkings(workings);
     }
 
-    public void equalsOnClick(View view)
-    {
-        int count = 0;
-        for(int i = 0; i < workings.length(); i++) {
-            if (workings.charAt(i) == '(') {
-                count++;
-            } else if (workings.charAt(i) == ')') {
-                count--;
+    public void equalsOnClick(View view) {
+        if (!workings.isEmpty()) {
+            if(workings.charAt(workings.length() - 1) != '(' && workings.charAt(workings.length() - 1) != '-') {
+                int count = 0;
+                for (int i = 0; i < workings.length(); i++) {
+                    if (workings.charAt(i) == '(') {
+                        count++;
+                    } else if (workings.charAt(i) == ')') {
+                        count--;
+                    }
+                }
+
+                for (int i = 0; i < count; i++) {
+                    setWorkings(")");
+                }
             }
+
+
+            Double result;
+                try {
+                    Expression expression = new ExpressionBuilder(workings).build();
+                    result = expression.evaluate();
+                    SetTextResults(result.toString());
+                    checkMemory = true;
+                } catch (Exception ex) {
+                    String exception = ex.toString();
+                    exception = exception.substring(exception.indexOf(":") + 1);
+                    Toast.makeText(MainActivity.this, exception, Toast.LENGTH_SHORT).show();
+                }
         }
-
-        for (int i = 0; i < count; i++)
-        {
-            setWorkings(")");
-        }
-
-
-        Double result;
-        Expression expression = new ExpressionBuilder(workings).build();
-            try {
-
-                result = expression.evaluate();
-                SetTextResults(result.toString());
-
-            } catch (Exception ex) {
-                String exception = ex.toString();
-                exception = exception.substring(exception.indexOf(":") + 1);
-                Toast.makeText(MainActivity.this, exception, Toast.LENGTH_SHORT).show();
-            }
     }
 
     private void ContinueCalculations() {
@@ -90,11 +118,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isNumeric(char c)
-    {
-        return (c <= '9' && c >= '0') || c == '.';
+    private boolean isNumeric(char c) {
+        return (c <= '9' && c >= '0');
     }
-
 
     public void clearOnClick(View view) {
         workings = "";
@@ -171,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     public void sevenOnClick(View view) {
         ContinueCalculationsNumber();
         CheckNumbers();
@@ -284,9 +311,14 @@ public class MainActivity extends AppCompatActivity {
         CheckNumbers();
         if(workings.isEmpty()) {
             setWorkings("0.");
-        } else if(!isNumeric(workings.charAt(workings.length() - 1))) {
-            setWorkings("0.");
         } else {
+            for(int i = workings.length() - 1; i >= 0; --i) {
+                if(workings.charAt(i) == '.') {
+                    return;
+                } else if (!isNumeric(workings.charAt(i))) {
+                    break;
+                }
+            }
             setWorkings(".");
         }
     }
@@ -296,10 +328,91 @@ public class MainActivity extends AppCompatActivity {
         CheckNumbers();
         if(workings.isEmpty()) {
             setWorkings("0.");
-        } else if(!isNumeric(workings.charAt(workings.length() - 1))) {
+        } /*else if(!isNumeric(workings.charAt(workings.length() - 1))) {
             setWorkings("0.");
-        } else {
+        } */
+        else {
             setWorkings("0");
+        }
+    }
+
+    public void cosOnClick(View view) {
+        ContinueCalculationsNumber();
+        CheckNumbers();
+        if(!workings.isEmpty()) {
+            if (isNumeric(workings.charAt(workings.length() - 1))) {
+                setWorkings("*");
+            }
+        }
+        setWorkings("cos(");
+    }
+
+    public void sinOnClick(View view) {
+        ContinueCalculationsNumber();
+        CheckNumbers();
+        if(!workings.isEmpty()) {
+            if (isNumeric(workings.charAt(workings.length() - 1))) {
+                setWorkings("*");
+            }
+        }
+        setWorkings("sin(");
+    }
+
+    public void mrOnClick(View view) {
+        if (!memory.isEmpty()) {
+            workings = memory;
+            SetTextResults("");
+            SetTextWorkings(workings);
+
+        }
+        else {
+            SetTextResults("");
+            SetTextWorkings("0");
+        }
+    }
+
+    public void mPlusOnClick(View view) {
+        String rsl = GetTextResults();
+        if (!rsl.isEmpty() && checkMemory) {
+            if (!memory.isEmpty()) {
+                Double result;
+                Expression expression = new ExpressionBuilder(memory + "+" + rsl).build();
+                result = expression.evaluate();
+                memory = result.toString();
+            }
+            else {
+                memory = rsl;
+            }
+
+            checkMemory = false;
+        }
+    }
+
+    public void mMinesOnClick(View view) {
+        String rsl = GetTextResults();
+        if (!rsl.isEmpty() && checkMemory) {
+            if (!memory.isEmpty()) {
+                Double result;
+                Expression expression = new ExpressionBuilder(memory + "-" + rsl).build();
+                result = expression.evaluate();
+                memory = result.toString();
+            }
+            else {
+                memory = "-" + rsl;
+            }
+
+            checkMemory = false;
+        }
+    }
+
+    public void McleanOnClick(View view) {
+        memory = "0";
+    }
+
+    public void MSaveOnClick(View view) {
+        String rsl = GetTextResults();
+        if (!rsl.isEmpty()) {
+            memory = rsl;
         }
     }
 }
