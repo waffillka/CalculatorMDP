@@ -42,12 +42,6 @@ public class MainActivity extends AppCompatActivity {
         resultsTV = (TextView)findViewById(R.id.resultTextView);
         workingsTV = (TextView)findViewById(R.id.workingsTextView);
 
-        //workingsTV.setMovementMethod(new ScrollingMovementMethod());
-        //workingsTV.setHorizontallyScrolling(true);
-       /*workingsTextView.setSelected(true);
-        workingsTextView.setEllipsize(TextUtils.TruncateAt.START);
-        workingsTextView.setSingleLine(true);*/
-
         int childCount = linearLayout.getChildCount();
 
         for (int i = 0; i < childCount; i++) {
@@ -104,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                     Expression expression = new ExpressionBuilder(workings).build();
                     result = expression.evaluate();
                     SetTextResults(result.toString());
-                    checkMemory = true;
+                    //checkMemory = true;
                 } catch (Exception ex) {
                     String exception = ex.toString();
                     exception = exception.substring(exception.indexOf(":") + 1);
@@ -322,9 +316,10 @@ public class MainActivity extends AppCompatActivity {
         CheckNumbers();
         if(workings.isEmpty()) {
             setWorkings("0.");
-        } else if(!isNumeric(workings.charAt(workings.length() - 1))) {
+        } /*else if(!isNumeric(workings.charAt(workings.length() - 1))) {
             setWorkings("0.");
-        }else {
+        }*/
+        else {
             for(int i = workings.length() - 1; i >= 0; --i) {
                 if(workings.charAt(i) == '.') {
                     return;
